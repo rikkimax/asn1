@@ -1,0 +1,22 @@
+{
+	"name": "asn1",
+	"description": "A minimal D application.",
+	"copyright": "Copyright © 2014, rikki",
+	"authors": ["rikki"],
+	"dependencies": {
+		"asn1:parser": "~master"
+	},
+	"subPackages": [
+		{
+			"name": "parser",
+			"sourcePaths": ["source/asn1/parser"],
+			"targetType": "library"
+		},
+		{
+			"name": "test",
+			"sourceFiles": ["source/asn1/main.d"],
+			"stringImportPaths": ["resources"],
+			"targetType": "executable"
+		}
+	]
+}

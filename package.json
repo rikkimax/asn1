@@ -6,6 +6,8 @@
 	"dependencies": {
 		"asn1:parser": "~master"
 	},
+	"sourcePaths": [],
+	"targetType": "library",
 	"subPackages": [
 		{
 			"name": "parser",

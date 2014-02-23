@@ -2,14 +2,6 @@
 import asn1.parser.handler;
 import std.conv : to;
 
-mixin template ParseASN1File(string file) {
-	mixin ParseASN1Text!(import(file));
-}
-
-mixin template ParseASN1Text(string text) {
-	
-}
-
 enum TagDefaultOption {
 	Explicit,
 	Implicit,
@@ -36,6 +28,12 @@ struct ASN1ParserData {
 		}
 		
 		ret ~= getIndent(indent) ~ "]]";
+		return ret;
+	}
+	
+	static pure ASN1ParserData parse(string text) {
+		ASN1ParserData ret = ASN1ParserData(text);
+		executeASN1Parser(ret);
 		return ret;
 	}
 }

@@ -1,10 +1,10 @@
-{
+	{
 	"name": "asn1",
 	"description": "A minimal D application.",
 	"copyright": "Copyright © 2014, rikki",
 	"authors": ["rikki"],
 	"dependencies": {
-		"asn1:parser": "~master"
+		"asn1:generator": "~master"
 	},
 	"sourcePaths": [],
 	"targetType": "library",
@@ -15,10 +15,29 @@
 			"targetType": "library"
 		},
 		{
+			"name": "generator",
+			"sourcePaths": ["source/asn1/generator"],
+			"targetType": "library",
+			"dependencies": {
+				"asn1:parser": "~master",
+				"asn1:encoder-ber": "~master"
+			}
+		},
+		{
+			"name": "encoder-ber",
+			"sourcePaths": ["source/asn1/encoders/ber"],
+			"targetType": "library"
+		},
+		{
 			"name": "test",
-			"sourceFiles": ["source/asn1/main.d"],
+			"mainSourceFile": "source/asn1/main.d",
 			"stringImportPaths": ["resources"],
-			"targetType": "executable"
+			"targetType": "executable",
+			"dependencies": {
+				"asn1:parser": "~master",
+				"asn1:generator": "~master",
+				"asn1:encoder-ber": "~master"
+			}
 		}
 	]
 }

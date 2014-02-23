@@ -1,4 +1,7 @@
+module asn1.main;
+
 import asn1.parser;
+import asn1.generator.defs;
 
 void main() {
 	//const auto data = test!("Test DEFINITIONS ::= BEGIN END\nByesies DEFINITIONS ::= BEGIN END");
@@ -15,3 +18,7 @@ pure ASN1ParserData test(string text)() {
 	executeASN1Parser(data);
 	return data;
 }
+
+mixin ASN1StructureFile!"ldap.asn";
+
+pragma(msg, __traits(allMembers, asn1.main));

@@ -62,19 +62,17 @@ pure string getDefinitionStruct(DefsPass pass) {
 			switch(pass.def.nameOfType.toLower()) {
 				case "integer":
 					if (pass.generateProperties) {
-						ret ~= getIndent(pass.tabbed) ~ "int _" ~ pass.def.name.tr("-", "_") ~ ";\n";
-						ret ~= getIndent(pass.tabbed) ~ "@property int " ~ pass.def.name.tr("-", "_") ~ "() {return _" ~ pass.def.name.tr("-", "_") ~ ((pass.choice ? "; choice = " ~ to!string(pass.choiceVal) : "" )) ~ ";}\n";
-						ret ~= getIndent(pass.tabbed) ~ "@property void " ~ pass.def.name.tr("-", "_") ~ "(int value) {return _" ~ pass.def.name.tr("-", "_") ~ " = value;}\n";
+						ret ~= getIndent(pass.tabbed) ~ "size_t _" ~ pass.def.name.tr("-", "_") ~ ";\n";
+						ret ~= getIndent(pass.tabbed) ~ "@property size_t " ~ pass.def.name.tr("-", "_") ~ "() {return _" ~ pass.def.name.tr("-", "_") ~ ((pass.choice ? "; choice = " ~ to!string(pass.choiceVal) : "" )) ~ ";}\n";
+						ret ~= getIndent(pass.tabbed) ~ "@property void " ~ pass.def.name.tr("-", "_") ~ "(size_t value) {return _" ~ pass.def.name.tr("-", "_") ~ " = value;}\n";
 					} else
 						ret ~= getIndent(pass.tabbed) ~ "int " ~ pass.def.name.tr("-", "_") ~ ";\n";
 					break;
 				case "octet string":
 					ret ~= getIndent(pass.tabbed) ~ "struct " ~ pass.def.name.tr("-", "_") ~ " {\n";
 					
-					ret ~= getIndent(pass.tabbed + 1) ~ "int value;\n";
+					ret ~= getIndent(pass.tabbed + 1) ~ "size_t value;\n";
 					ret ~= getIndent(pass.tabbed + 1) ~ "alias value this;\n";
-					
-					// TODO invariants
 					
 					ret ~= getIndent(pass.tabbed) ~ "}\n";
 					break;
@@ -94,13 +92,29 @@ pure string getDefinitionStruct(DefsPass pass) {
 				case "integer":
 					ret ~= getIndent(pass.tabbed) ~ "struct " ~ pass.def.name.tr("-", "_") ~ " {\n";
 					
-					ret ~= getIndent(pass.tabbed + 1) ~ "int value;\n";
+					ret ~= getIndent(pass.tabbed + 1) ~ "size_t value;\n";
 					ret ~= getIndent(pass.tabbed + 1) ~ "alias value this;\n";
 					
-					// TODO invariants
+					ret ~= getIndent(pass.tabbed + 1) ~ "invariant() {\n";
+					
+					ret ~= getIndent(pass.tabbed + 2) ~ "assert(value >= " ~ pass.def.valueRangeMin ~ ");\n";
+					ret ~= getIndent(pass.tabbed + 2) ~ "assert(value < " ~ pass.def.valueRangeMax ~ ");\n";
+					
+					ret ~= getIndent(pass.tabbed + 1) ~ "}\n";
 					
 					ret ~= getIndent(pass.tabbed) ~ "}\n";
 					break;
+				default:
+					break;
+			}
+			break;
+			
+		case ASN1DefinitionType.ValueAssignment:
+			switch(pass.def.nameOfType.toLower()) {
+				case "integer":
+					ret ~= getIndent(pass.tabbed) ~ "enum int " ~ pass.def.name.tr("-", "_") ~ " = " ~ pass.def.value ~ ";\n";
+					break;
+					
 				default:
 					break;
 			}

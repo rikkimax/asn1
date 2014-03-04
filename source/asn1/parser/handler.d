@@ -62,13 +62,19 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 			// EncodingPrefix
 			if (lineA[0][0] == '[') {
 				string prefix = lineA[0][1 .. $];
-				foreach(s; lineA[1 .. $]) {
-					removeFirstLineA();
-					if (s[$-1] == ']') {
-						prefix ~= " " ~ s[0 .. $-1];
-						break;
+				removeFirstLineA();
+				
+				if (prefix[$-1] == ']') {
+					prefix = prefix[0 .. $-1];
+				} else {
+					foreach(s; lineA[1 .. $]) {
+						removeFirstLineA();
+						if (s[$-1] == ']') {
+							prefix ~= " " ~ s[0 .. $-1];
+							break;
+						}
+						prefix ~= " " ~ s;
 					}
-					prefix ~= " " ~ s;
 				}
 				
 				currentDef.encodingPrefix = prefix;
@@ -312,6 +318,11 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 								
 								currentDef.valueRangeMin = aS[0];
 								currentDef.valueRangeMax = aS[1];
+								
+								removeFirstLineA();
+								removeFirstLineA();
+								removeFirstLineA();
+								removeFirstLineA();
 							}
 						}
 					}

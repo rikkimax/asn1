@@ -19,6 +19,5 @@ pure ASN1ParserData test(string text)() {
 	return data;
 }
 
-mixin ASN1StructureFile!"ldap.asn";
-
-pragma(msg, __traits(allMembers, asn1.main));
+//mixin ASN1StructureFile!"ldap.asn";
+mixin ASN1StructureFile!"test.asn";

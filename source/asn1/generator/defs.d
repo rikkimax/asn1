@@ -7,5 +7,7 @@ mixin template ASN1StructureFile(string file) {
 
 mixin template ASN1Structure(string text) {
 	import asn1.generator.generator;
+	pragma(msg, getStruct(ASN1ParserData.parse(text)));
+	pragma(msg, ASN1ParserData.parse(text).output());
 	mixin(getStruct(ASN1ParserData.parse(text)));
 }

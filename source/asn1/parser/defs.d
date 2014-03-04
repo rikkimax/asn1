@@ -117,7 +117,7 @@ class ASN1ProtocolDefinition {
 	}
 }
 
-string getIndent(size_t size) {
+pure string getIndent(size_t size) {
 	string ret;
 	
 	for (size_t i=0; i < size; i++) {

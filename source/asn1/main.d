@@ -11,6 +11,7 @@ void main() {
 	auto data = test!(import("ldap.asn"));
 	import std.file;
 	write("out.txt", data.output());
+	outputASN1StructureFileToFile!"ldap.asn"("out2.d");
 }
 
 pure ASN1ParserData test(string text)() {
@@ -20,4 +21,4 @@ pure ASN1ParserData test(string text)() {
 }
 
 //mixin ASN1StructureFile!"ldap.asn";
-mixin ASN1StructureFile!"test.asn";
+mixin ASN1StructureFile!"ldap.asn";

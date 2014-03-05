@@ -68,6 +68,7 @@ enum ASN1DefinitionType {
 	Sequence,
 	Choice,
 	TypeAssignment,
+	PropertyAssignment,
 	ValueAssignment,
 	RangeValueAssignment,
 	SequenceOf,

@@ -1,6 +1,6 @@
 ﻿module asn1.parser.handler;
 import asn1.parser.defs;
-import std.string : splitLines, strip, indexOf;
+import std.string : splitLines, strip, indexOf, toLower;
 import std.conv : to;
 
 pure void executeASN1Parser(ref ASN1ParserData data) {
@@ -12,7 +12,7 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 	size_t braceIn;
 	bool increasedBrace;
 	
-	foreach(line; data.text.splitLines()) {
+L1: foreach(line; data.text.splitLines()) {
 		line = line.strip();
 		string[] lineA = line.split(" ", "\t").notEmptyElements().notCommentedElements();
 		
@@ -67,7 +67,7 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 				if (prefix[$-1] == ']') {
 					prefix = prefix[0 .. $-1];
 				} else {
-					foreach(s; lineA[1 .. $]) {
+					foreach(s; lineA[0 .. $]) {
 						removeFirstLineA();
 						if (s[$-1] == ']') {
 							prefix ~= " " ~ s[0 .. $-1];
@@ -86,8 +86,12 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 					repeat = false;
 				
 				assert(lineA.length > 0);
-				switch (lineA[0]) {
-					case "SEQUENCE":
+				switch (lineA[0].toLower()) {
+					case "::=":
+						currentDef.type = ASN1DefinitionType.TypeAssignment;
+						break;
+						
+					case "sequence":
 						currentDef.type = ASN1DefinitionType.Sequence;
 						if (lineA.length > 1) {
 							if (lineA[1] == "OF") {
@@ -97,10 +101,10 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 							}
 						}
 						break;
-					case "ENUMERATED":
+					case "enumerated":
 						currentDef.type = ASN1DefinitionType.Enumerated;
 						break;
-					case "SET": 
+					case "set": 
 						currentDef.type = ASN1DefinitionType.Set;
 						if (lineA.length > 1) {
 							if (lineA[1] == "OF") {
@@ -110,15 +114,17 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 							}
 						}
 						break;
-					case "CHOICE": 
+					case "choice": 
 						currentDef.type = ASN1DefinitionType.Choice;
 						break;
-					case "OCTET":
+					case "octet":
 						if (lineA.length > 1) {
-							if (lineA[1] == "STRING") {
+							if (lineA[1][$-1] == ',')
+								lineA[1].length--;
+							if (lineA[1].toLower() == "string" || lineA[1].toLower()) {
 								removeFirstLineA();
 								currentDef.nameOfType = "OCTET STRING";
-								currentDef.type = ASN1DefinitionType.TypeAssignment;
+								//currentDef.type = ASN1DefinitionType.TypeAssignment;
 							}
 						}
 						break;
@@ -140,15 +146,14 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 						
 						if (defaultHandler)
 							currentDef.nameOfType = lineA[0];
-						
-						if (currentDef.type != ASN1DefinitionType.SequenceOf &&
-						    currentDef.type != ASN1DefinitionType.SetOf)
-							currentDef.type = ASN1DefinitionType.TypeAssignment;
 						break;
 				}
 				
 				removeFirstLineA();
 			} while(repeat);
+			
+			if (currentDef.type == ASN1DefinitionType.Unknown)
+				currentDef.type = ASN1DefinitionType.TypeAssignment;
 			
 			if (lineA.length > 0) {
 				string t;
@@ -171,6 +176,12 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 					default:
 						break;
 				}
+			}
+		}
+		
+		if (lineA.length > 0) {
+			if (lineA[0] == "--") {
+				removeFirstLineA();
 			}
 		}
 		
@@ -287,6 +298,12 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 				if (repeat)
 					repeat = false;
 				
+				if (lineA.length > 0) {
+					if (lineA[0] == "--") {
+						continue L1;
+					}
+				}
+				
 				if (subStage == 1 || subStage == 2) {
 					if (lineA.length > 4) {
 						if (lineA[1] == "::=") {
@@ -345,7 +362,7 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 					}
 					
 					if (lineA.length > 1) {
-						// AssignmentList
+						// AssignmentList / TypeAssignment
 						
 						if (lineA[1] == "::=") {
 							incrementChildDefinitionCount();
@@ -370,12 +387,13 @@ pure void executeASN1Parser(ref ASN1ParserData data) {
 				}
 				
 				if (subStage == 2) {
-					// TypeAssignment
+					// PropertyAssignment
 					if (lineA.length > 1) {
 						incrementSiblingDefinitionCount();
 						increasedBrace = false;
 						
 						currentDef.name = lineA[0];
+						currentDef.type = ASN1DefinitionType.PropertyAssignment;
 						
 						removeFirstLineA();
 						handleDefType();

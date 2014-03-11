@@ -161,39 +161,30 @@ pure void encodeType(T)(ref EncodedData parent, T t) {
 }
 
 unittest {
-	import std.stdio;
 	EncodedData iData;
 	
 	iData = EncodedData();
 	encodeType(iData, 0);
-	writeln(iData.content);
 	assert(iData.content == [0x02, 0x01, 0x0]);
 	
 	iData = EncodedData();
 	encodeType(iData, 127);
-	writeln(iData.content);
 	assert(iData.content == [0x02, 0x01, 0x7F]);
 	
 	iData = EncodedData();
 	encodeType(iData, 128);
-	writeln(iData.content);
 	assert(iData.content == [0x02, 0x02, 0x0, 0x80]);
 	
 	iData = EncodedData();
 	encodeType(iData, 256);
-	writeln(iData.content);
 	assert(iData.content == [0x02, 0x02, 0x1, 0x0]);
 	
 	iData = EncodedData();
 	encodeType(iData, -128);
-	writeln(iData.content);
 	assert(iData.content == [0x02, 0x01, 0x80]);
-	
-	writeln(pack!`>i`(-128));
 	
 	iData = EncodedData();
 	encodeType(iData, -129);
-	writeln(iData.content);
 	assert(iData.content == [0x02, 0x02, 0xFF, 0x7F]);
 }
 

@@ -26,7 +26,10 @@
 		{
 			"name": "encoder-ber",
 			"sourcePaths": ["source/asn1/encoders/ber"],
-			"targetType": "library"
+			"targetType": "library",
+			"dependencies": {
+				"pack-d": "~master"
+			}
 		},
 		{
 			"name": "test",

@@ -3,6 +3,16 @@ import asn1.parser.defs;
 import std.string : splitLines, strip, indexOf, toLower;
 import std.conv : to;
 
+/**
+ * 
+ * TODO:
+ * 		Support encode orders e.g.
+ * 			[APPLICATION 5] SEQUENCE 	= encode order of 5
+ * 			[4] Type 					= encode order of 4
+ * 		Support classes for encoding e.g.
+ * 			[APPLICATION] 				= Application class
+ * 			A class can be either UNIVERSAL, APPLICATION or PRIVATE
+ */
 pure void executeASN1Parser(ref ASN1ParserData data) {
 	size_t stage;
 	size_t subStage;
@@ -442,6 +452,7 @@ private {
 	}
 	
 	unittest {
+		string test = "abcd|efgh|ijkl";
 		assert(test.split("|") == ["abcd", "efgh", "ijkl"]);
 		string test2 = "abcd||efgh||ijkl";
 		assert(test2.split("||") == ["abcd", "efgh", "ijkl"]);

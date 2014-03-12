@@ -9,6 +9,39 @@ enum TagDefaultOption {
 	Empty
 }
 
+enum ASN1DefinitionType {
+	Unknown,
+	Sequence,
+	Choice,
+	TypeAssignment,
+	PropertyAssignment,
+	ValueAssignment,
+	RangeValueAssignment,
+	SequenceOf,
+	Set,
+	SetOf,
+	Enumerated
+}
+
+enum ASN1PresenceConstraint {
+	Unknown,
+	Absent,
+	Prsent,
+	Optional
+}
+
+enum ASN1EncodeClassTag {
+	Unknown,
+	Universal,
+	Application,
+	Context_Specific,
+	Private
+}
+
+/**
+ * Data containers
+ */
+
 struct ASN1ParserData {
 	string text;
 	ASN1ProtocolData[] protocols;
@@ -16,7 +49,9 @@ struct ASN1ParserData {
 	string output(size_t indent=0) {
 		string ret;
 		ret ~= getIndent(indent) ~ "[";
-		//ret ~= text ~ ", "; // seperated out so can remove Huge text from debug message.
+		debug {
+			ret ~= text ~ ", "; // seperated out so can remove Huge text from debug message.
+		}
 		ret ~= "[\r\n";
 		foreach (p; protocols) {
 			ret ~= p.output(indent + 1) ~ ", \r\n";
@@ -63,27 +98,6 @@ class ASN1ProtocolData {
 	}
 }
 
-enum ASN1DefinitionType {
-	Unknown,
-	Sequence,
-	Choice,
-	TypeAssignment,
-	PropertyAssignment,
-	ValueAssignment,
-	RangeValueAssignment,
-	SequenceOf,
-	Set,
-	SetOf,
-	Enumerated
-}
-
-enum ASN1PresenceConstraint {
-	Unknown,
-	Absent,
-	Prsent,
-	Optional
-}
-
 class ASN1ProtocolDefinition {
 	string name;
 	string nameOfType;
@@ -93,7 +107,9 @@ class ASN1ProtocolDefinition {
 	string valueRangeMin;
 	string valueRangeMax;
 	
-	string encodingPrefix;
+	ASN1EncodeClassTag encodingClass;
+	size_t encodingOrder;
+	
 	ASN1PresenceConstraint presenceConstraint;
 	
 	ASN1ProtocolDefinition parentDef;
@@ -102,7 +118,7 @@ class ASN1ProtocolDefinition {
 	string output(size_t indent=0) {
 		string ret;
 		ret ~= getIndent(indent) ~ "[" ~ to!string(type) ~ ", " ~ name ~ ", " ~ nameOfType ~ ", " ~ value ~ ", " ~
-			valueRangeMin ~ ", " ~ valueRangeMax ~ ", " ~ encodingPrefix ~ ", " ~ to!string(presenceConstraint) ~ ", [\r\n";
+			valueRangeMin ~ ", " ~ valueRangeMax ~ ", " ~ to!string(encodingClass) ~ ", " ~ to!string(encodingOrder) ~ ", " ~ to!string(presenceConstraint) ~ ", [\r\n";
 		
 		foreach (d; subDefs) {
 			ret ~= d.output(indent + 1) ~ ", \r\n";
@@ -117,6 +133,10 @@ class ASN1ProtocolDefinition {
 		return ret;
 	}
 }
+
+/**
+ * Helpers
+ */
 
 pure string getIndent(size_t size) {
 	string ret;

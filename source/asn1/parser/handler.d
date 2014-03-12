@@ -4,14 +4,10 @@ import std.string : splitLines, strip, indexOf, toLower;
 import std.conv : to;
 
 /**
+ * Converts an ASN.1 notation file into a ASN1ParserData struct.
  * 
- * TODO:
- * 		Support encode orders e.g.
- * 			[APPLICATION 5] SEQUENCE 	= encode order of 5
- * 			[4] Type 					= encode order of 4
- * 		Support classes for encoding e.g.
- * 			[APPLICATION] 				= Application class
- * 			A class can be either UNIVERSAL, APPLICATION or PRIVATE
+ * Params:
+ * 		data	=	A struct that contains all to be done and returned data upon.
  */
 pure void executeASN1Parser(ref ASN1ParserData data) {
 	size_t stage;
@@ -71,23 +67,85 @@ L1: foreach(line; data.text.splitLines()) {
 			
 			// EncodingPrefix
 			if (lineA[0][0] == '[') {
-				string prefix = lineA[0][1 .. $];
-				removeFirstLineA();
-				
-				if (prefix[$-1] == ']') {
-					prefix = prefix[0 .. $-1];
-				} else {
-					foreach(s; lineA[0 .. $]) {
-						removeFirstLineA();
-						if (s[$-1] == ']') {
-							prefix ~= " " ~ s[0 .. $-1];
-							break;
+				if (lineA[0][$-1] == ']' && lineA[0].length > 2) {
+					try {
+						// is a order
+						currentDef.encodingOrder = to!size_t(lineA[0][1 .. $-2]);
+					} catch(Exception e) {
+						// is a class
+						switch(lineA[0][1 .. $-2].toLower()) {
+							case "application":
+								currentDef.encodingClass = ASN1EncodeClassTag.Application;
+								break;
+								
+							case "context-specific":
+								currentDef.encodingClass = ASN1EncodeClassTag.Context_Specific;
+								break;
+								
+							case "private":
+								currentDef.encodingClass = ASN1EncodeClassTag.Private;
+								break;
+								
+							case "universal":
+								currentDef.encodingClass = ASN1EncodeClassTag.Universal;
+								break;
+								
+							default:
+								currentDef.encodingClass = ASN1EncodeClassTag.Unknown;
+								break;
 						}
-						prefix ~= " " ~ s;
+					}
+					removeFirstLineA();
+				} else {
+					if (lineA[0][0] == '[') {
+						string[] prefix;
+						prefix ~= lineA[0][1 .. $];
+						removeFirstLineA();
+						
+						foreach(s; lineA[0 .. $]) {
+							removeFirstLineA();
+							if (s[$-1] == ']') {
+								prefix ~= " " ~ s[0 .. $-1];
+								break;
+							}
+							prefix ~= " " ~ s;
+						}
+						
+						if (prefix.length > 2) {
+							assert(0, "Ugh length error. An encoding data can only be in format: [class order] or [order].");
+						} else {
+							foreach(v; prefix) {
+								try {
+									// is a order
+									currentDef.encodingOrder = to!size_t(v);
+								} catch(Exception e) {
+									// is a class
+									switch(v.toLower()) {
+										case "application":
+											currentDef.encodingClass = ASN1EncodeClassTag.Application;
+											break;
+											
+										case "context-specific":
+											currentDef.encodingClass = ASN1EncodeClassTag.Context_Specific;
+											break;
+											
+										case "private":
+											currentDef.encodingClass = ASN1EncodeClassTag.Private;
+											break;
+											
+										case "universal":
+											currentDef.encodingClass = ASN1EncodeClassTag.Universal;
+											break;
+											
+										default:
+											currentDef.encodingClass = ASN1EncodeClassTag.Unknown;
+											break;
+									}
+								}
+							}
+						}
 					}
 				}
-				
-				currentDef.encodingPrefix = prefix;
 			}
 			
 			bool repeat;

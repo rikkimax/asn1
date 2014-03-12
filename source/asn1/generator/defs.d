@@ -1,6 +1,7 @@
 ﻿module asn1.generator.defs;
-import asn1.parser.defs;
 import asn1.generator.generator;
+public import asn1.encoder.ber.defs : ASN1ConstructedType;
+import asn1.parser.defs;
 import std.file;
 
 struct ASN1NullType {}

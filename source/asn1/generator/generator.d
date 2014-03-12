@@ -30,6 +30,13 @@ struct DefsPass {
 	bool generateEnumValue;
 }
 
+/**
+ * Creates a string which comprises of a definition.
+ * 
+ * TODO:
+ * 		- Implement @ASN1ConstructedTypeUDA(ASN1ConstructedType.SEQUENCE/SET/SEQUENCE_OF/SET_OF)
+ * 		- Implement @ASN1EncodedUDA(size_t order[, ASN1EncodeClassTag. ...])
+ */
 pure string getDefinitionStruct(DefsPass pass) {
 	string ret;
 	

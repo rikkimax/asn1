@@ -1,12 +1,32 @@
 ﻿module asn1.encoder.ber.defs;
 import asn1.encoder.ber.base2;
+import asn1.parser.defs;
 import std.traits : isSomeString;
 
-enum ClassTag : ubyte {
-	Universal = (1 << 0),
-	Application = (1 << 1),
-	Context_Specific = (1 << 0),
-	Private = (1 << 0) | (1 << 1)
+enum ASN1ConstructedType {
+	Unknown,
+	Sequence,
+	Set
+}
+
+/**
+ * Turns an ASN1EncodeClassTag into a ubyte that has bits 7/8 encoded.
+ */
+pure ubyte classTagEncodeValue(ASN1EncodeClassTag tag) {
+	switch(tag) {
+		case ASN1EncodeClassTag.Application:
+			return (1 << 6) | (0 << 7);
+			
+		case ASN1EncodeClassTag.Context_Specific:
+			return (0 << 6) | (1 << 7);
+			
+		case ASN1EncodeClassTag.Private:
+			return (1 << 6) | (1 << 7);
+			
+		case ASN1EncodeClassTag.Universal:
+		default:
+			return (0 << 6) | (0 << 7);
+	}
 }
 
 /**
@@ -28,12 +48,6 @@ struct EncodedData {
 			content ~= data.content;
 		}
 	}
-}
-
-enum ASN1ConstructedType {
-	Unknown,
-	Sequence,
-	Set
 }
 
 /**

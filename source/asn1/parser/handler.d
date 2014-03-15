@@ -531,7 +531,7 @@ private {
 		string[] ret;
 		
 		foreach(e; elements) {
-			if (e == "--")
+			if (e.length >= 2 && e[0 .. 2] == "--")
 				return ret;
 			ret ~= e;
 		}
